@@ -1,11 +1,10 @@
 package clobber;
-import connect4.Connect4State;
-import connect4.MiniMaxConnect4Player.ScoredConnect4Move;
 import game.*;
 
 public class GeorgeClobberPlayer extends GamePlayer {
 	public final int MAX_DEPTH = 50;
 	public int depthLimit;
+	public final int MAX_SCORE = 100000;
 	
 	protected ScoredClobberMove [] mvStack;
 	
@@ -17,6 +16,10 @@ public class GeorgeClobberPlayer extends GamePlayer {
 		}
 		public void set(ClobberMove m, double s)
 		{
+			row1 = m.row1;
+			col1 = m.col1;
+			row2 = m.row2;
+			col2 = m.col2;
 			score = s;
 		}
 		public double score;
@@ -40,49 +43,60 @@ public class GeorgeClobberPlayer extends GamePlayer {
 //			ary[spot] = tmp;
 //		}
 //	}
-//	
-//	public void init()
-//	{
-//		mvStack = new ScoredClobberMove [MAX_DEPTH];
-//		for (int i=0; i<MAX_DEPTH; i++) {
-//			mvStack[i] = new ScoredClobberMove(,0);
-//		}
-//	}
-//	
-//	protected boolean terminalValue(GameState brd, ScoredClobberMove mv)
-//	{
-//		GameState.Status status = brd.getStatus();
-//		boolean isTerminal = true;
-//		
-//		return isTerminal;
-//	}
-//	
-//	private void minimax(Connect4State brd, int currDepth)
-//	{
-//		boolean toMaximize = (brd.getWho() == GameState.Who.HOME);
-//		boolean isTerminal = terminalValue(brd, mvStack[currDepth]);
-//		
-//		if (isTerminal) {
-//			;
-//		} else if (currDepth == depthLimit) {
-//			mvStack[currDepth].set(0, evalBoard(brd));
-//		} else {
-//			ScoredConnect4Move tempMv = new ScoredConnect4Move(0, 0);
-//
-//			double bestScore = (brd.getWho() == GameState.Who.HOME ? 
-//												Double.NEGATIVE_INFINITY :
-//												Double.POSITIVE_INFINITY);
-//			ScoredConnect4Move bestMove = mvStack[currDepth];
-//			ScoredConnect4Move nextMove = mvStack[currDepth+1];
-//			
-//			bestMove.set(0, bestScore);
-//			GameState.Who currTurn = brd.getWho();
-//
+	
+	public void init()
+	{
+		mvStack = new ScoredClobberMove [MAX_DEPTH];
+		for (int i=0; i<MAX_DEPTH; i++) {
+			mvStack[i] = new ScoredClobberMove(new ClobberMove(),0);
+		}
+	}
+
+	protected boolean terminalValue(GameState brd, ScoredClobberMove mv)
+	{
+		GameState.Status status = brd.getStatus();
+		boolean isTerminal = true;
+		
+		if (status == GameState.Status.HOME_WIN) {
+			mv.set(new ClobberMove(), MAX_SCORE);
+		} else if (status == GameState.Status.AWAY_WIN) {
+			mv.set(new ClobberMove(), -MAX_SCORE);
+		} else {
+			isTerminal = false;
+		}
+		return isTerminal;
+	}
+
+	private void minimax(ClobberState brd, int currDepth)
+	{
+		boolean toMaximize = (brd.getWho() == GameState.Who.HOME);
+		boolean isTerminal = terminalValue(brd, mvStack[currDepth]);
+		
+		if (isTerminal) {
+			;
+		} else if (currDepth == depthLimit) {
+			mvStack[currDepth].set(new ClobberMove(), evalBoard(brd));
+		} else {
+			ScoredClobberMove tempMv = new ScoredClobberMove(new ClobberMove(), 0);
+
+			double bestScore = (brd.getWho() == GameState.Who.HOME ? 
+												Double.NEGATIVE_INFINITY :
+												Double.POSITIVE_INFINITY);
+			ScoredClobberMove bestMove = mvStack[currDepth];
+			ScoredClobberMove nextMove = mvStack[currDepth+1];
+			
+			bestMove.set(new ClobberMove(), bestScore);
+			GameState.Who currTurn = brd.getWho();
+			
+			
+
 //			int [] columns = new int [COLS];
 //			for (int j=0; j<COLS; j++) {
 //				columns[j] = j;
 //			}
-//			shuffle(columns);
+//			
+//			//shuffle(columns);
+//			
 //			for (int i=0; i<Connect4State.NUM_COLS; i++) {
 //				int c = columns[i];
 //				if (brd.numInCol[c] < Connect4State.NUM_ROWS) {
@@ -96,28 +110,34 @@ public class GeorgeClobberPlayer extends GamePlayer {
 //					// Undo the move
 //					brd.numInCol[c]--;
 //					int row = brd.numInCol[c]; 
-//					brd.board[row][c] = Connect4State.emptySym;
+//					brd.board[row][c] = ClobberState.emptySym;
 //					brd.numMoves--;
 //					brd.status = GameState.Status.GAME_ON;
 //					brd.who = currTurn;
 //					
 //					// Check out the results, relative to what we've seen before
 //					if (toMaximize && nextMove.score > bestMove.score) {
-//						bestMove.set(c, nextMove.score);
+//						bestMove.set(new ClobberMove(), nextMove.score);
 //					} else if (!toMaximize && nextMove.score < bestMove.score) {
-//						bestMove.set(c, nextMove.score);
+//						bestMove.set(new ClobberMove(), nextMove.score);
 //					}
 //				}
 //			}
-//		}
-//	}
+		}
+	}
+	
+	public double evalBoard(ClobberState brd){
+		double score = 0;
+		
+		return score;
+	}
 	
 	public GameMove getMove(GameState state, String lastMove)
 	{
-		//Need to change minimax to work with our game
-		//minimax((Connect4State)brd, 0);
+		minimax((ClobberState)state, 0);
 		return mvStack[0];
 	}
+	
 	public static void main(String [] args)
 	{
 		int depth = 6;
