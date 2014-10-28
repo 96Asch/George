@@ -1,5 +1,6 @@
 package clobber;
 import game.*;
+import game.GameState.Who;
 
 public class GeorgeClobberPlayer extends GamePlayer {
 	public final int MAX_DEPTH = 50;
@@ -87,8 +88,20 @@ public class GeorgeClobberPlayer extends GamePlayer {
 			
 			bestMove.set(new ClobberMove(), bestScore);
 			GameState.Who currTurn = brd.getWho();
+			char mySymbol;
 			
+			if(currTurn == Who.AWAY){
+				mySymbol = ClobberState.awaySym;
+			}
+			else mySymbol = ClobberState.homeSym;
 			
+			for(int i = 0; i < ClobberState.ROWS; i++){
+				for(int j = 0; j < ClobberState.COLS; j++){
+					if(brd.board[i][j] == mySymbol){
+						
+					}
+				}
+			}
 
 //			int [] columns = new int [COLS];
 //			for (int j=0; j<COLS; j++) {
