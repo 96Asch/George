@@ -3,4 +3,14 @@ Heuristic 1: Isolate opponent pieces, count each orphaned opponent piece (cannot
 Heuristic 2: count up adjacent pieces belonging to George, for every two that are adjacent if there
 is an opponent piece that can move on one of them add 1 to the heuristic to make it more desirable
 
-Heuristic 3:
+Heuristic 3: Count up number of pieces adjacent
+
+Heuristic 4: Center control: count up number of pieces in the center of the board
+
+Heuristic 5: Edge Control: count up number of pieces on the edge of the board
+
+Heuristic 6: count up number of possible moves we have
+
+Heuristic 7: count up number of possible moves opponent has
+
+Heuristic 8: count up number of possible moves we have-number of possible moves opponent has
