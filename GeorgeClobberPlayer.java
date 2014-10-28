@@ -89,16 +89,56 @@ public class GeorgeClobberPlayer extends GamePlayer {
 			bestMove.set(new ClobberMove(), bestScore);
 			GameState.Who currTurn = brd.getWho();
 			char mySymbol;
+			char oppSymbol;
 			
 			if(currTurn == Who.AWAY){
 				mySymbol = ClobberState.awaySym;
+				oppSymbol = ClobberState.homeSym;
 			}
-			else mySymbol = ClobberState.homeSym;
+			else {
+				mySymbol = ClobberState.homeSym;
+				oppSymbol = ClobberState.awaySym;
+			}
 			
 			for(int i = 0; i < ClobberState.ROWS; i++){
 				for(int j = 0; j < ClobberState.COLS; j++){
 					if(brd.board[i][j] == mySymbol){
-						
+						if(i > 0){
+							tempMv.row1 = i;
+							tempMv.col1 = j;
+							tempMv.row2 = i - 1;
+							tempMv.col2 = j;
+							brd.makeMove(tempMv);
+							
+							minimax(brd, currDepth+1);
+						}
+						if(i < ClobberState.ROWS -1){
+							tempMv.row1 = i;
+							tempMv.col1 = j;
+							tempMv.row2 = i + 1;
+							tempMv.col2 = j;
+							brd.makeMove(tempMv);
+							
+							minimax(brd, currDepth+1);
+						}
+						if(j > 0){
+							tempMv.row1 = i;
+							tempMv.col1 = j;
+							tempMv.row2 = i;
+							tempMv.col2 = j - 1;
+							brd.makeMove(tempMv);
+							
+							minimax(brd, currDepth+1);
+						}
+						if(j < ClobberState.COLS -1){
+							tempMv.row1 = i;
+							tempMv.col1 = j;
+							tempMv.row2 = i;
+							tempMv.col2 = j + 1;
+							brd.makeMove(tempMv);
+							
+							minimax(brd, currDepth+1);
+						}
 					}
 				}
 			}
