@@ -203,6 +203,37 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	
 	public double evalBoard(ClobberState brd){
 		double score = 0;
+		char mySymbol;
+		char oppSymbol;
+		GameState.Who currTurn = brd.getWho();
+		
+		if(currTurn == Who.AWAY){
+			mySymbol = ClobberState.awaySym;
+			oppSymbol = ClobberState.homeSym;
+		}
+		else {
+			mySymbol = ClobberState.homeSym;
+			oppSymbol = ClobberState.awaySym;
+		}
+
+		for(int i = 0; i < ClobberState.ROWS; i++){
+			for(int j = 0; j < ClobberState.COLS; j++){
+				if(brd.board[i][j] == mySymbol){
+					if(i > 0 && brd.board[i-1][j] == mySymbol){
+						score++;
+					}
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol){
+						score++;
+					}
+					if(j > 0 && brd.board[i][j-1] == mySymbol){
+						score++;
+					}
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol){
+						score++;
+					}
+				}
+			}
+		}
 		
 		return score;
 	}
@@ -215,7 +246,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	
 	public static void main(String [] args)
 	{
-		int depth = 6;
+		int depth = 2;
 		GamePlayer p = new GeorgeClobberPlayer("George+", depth);
 		p.compete(args, 1);
 	}
