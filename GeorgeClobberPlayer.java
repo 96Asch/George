@@ -109,8 +109,22 @@ public class GeorgeClobberPlayer extends GamePlayer {
 							tempMv.row2 = i - 1;
 							tempMv.col2 = j;
 							brd.makeMove(tempMv);
-							
+
 							minimax(brd, currDepth+1);
+							
+							//Undo move
+							brd.board[i][j] = mySymbol;
+							brd.board[i-1][j] = oppSymbol;
+							brd.numMoves--;
+							brd.status = GameState.Status.GAME_ON;
+							brd.who = currTurn;
+
+							//Check Results
+							if (toMaximize && nextMove.score > bestMove.score) {
+								bestMove.set(tempMv, nextMove.score);
+							} else if (!toMaximize && nextMove.score < bestMove.score) {
+								bestMove.set(tempMv, nextMove.score);
+							}
 						}
 						if(i < ClobberState.ROWS -1){
 							tempMv.row1 = i;
@@ -118,8 +132,22 @@ public class GeorgeClobberPlayer extends GamePlayer {
 							tempMv.row2 = i + 1;
 							tempMv.col2 = j;
 							brd.makeMove(tempMv);
-							
+
 							minimax(brd, currDepth+1);
+
+							//Undo move
+							brd.board[i][j] = mySymbol;
+							brd.board[i+1][j] = oppSymbol;
+							brd.numMoves--;
+							brd.status = GameState.Status.GAME_ON;
+							brd.who = currTurn;
+
+							//Check Results
+							if (toMaximize && nextMove.score > bestMove.score) {
+								bestMove.set(tempMv, nextMove.score);
+							} else if (!toMaximize && nextMove.score < bestMove.score) {
+								bestMove.set(tempMv, nextMove.score);
+							}
 						}
 						if(j > 0){
 							tempMv.row1 = i;
@@ -127,8 +155,22 @@ public class GeorgeClobberPlayer extends GamePlayer {
 							tempMv.row2 = i;
 							tempMv.col2 = j - 1;
 							brd.makeMove(tempMv);
-							
+
 							minimax(brd, currDepth+1);
+							
+							//Undo move
+							brd.board[i][j] = mySymbol;
+							brd.board[i][j-1] = oppSymbol;
+							brd.numMoves--;
+							brd.status = GameState.Status.GAME_ON;
+							brd.who = currTurn;
+
+							//Check Results
+							if (toMaximize && nextMove.score > bestMove.score) {
+								bestMove.set(tempMv, nextMove.score);
+							} else if (!toMaximize && nextMove.score < bestMove.score) {
+								bestMove.set(tempMv, nextMove.score);
+							}
 						}
 						if(j < ClobberState.COLS -1){
 							tempMv.row1 = i;
@@ -136,46 +178,26 @@ public class GeorgeClobberPlayer extends GamePlayer {
 							tempMv.row2 = i;
 							tempMv.col2 = j + 1;
 							brd.makeMove(tempMv);
-							
+
 							minimax(brd, currDepth+1);
+							
+							//Undo move
+							brd.board[i][j] = mySymbol;
+							brd.board[i][j+1] = oppSymbol;
+							brd.numMoves--;
+							brd.status = GameState.Status.GAME_ON;
+							brd.who = currTurn;
+
+							//Check Results
+							if (toMaximize && nextMove.score > bestMove.score) {
+								bestMove.set(tempMv, nextMove.score);
+							} else if (!toMaximize && nextMove.score < bestMove.score) {
+								bestMove.set(tempMv, nextMove.score);
+							}
 						}
 					}
 				}
 			}
-
-//			int [] columns = new int [COLS];
-//			for (int j=0; j<COLS; j++) {
-//				columns[j] = j;
-//			}
-//			
-//			//shuffle(columns);
-//			
-//			for (int i=0; i<Connect4State.NUM_COLS; i++) {
-//				int c = columns[i];
-//				if (brd.numInCol[c] < Connect4State.NUM_ROWS) {
-//					// Make move on board
-//					tempMv.col = c;
-//					brd.makeMove(tempMv);
-//					
-//					// Check out worth of this move
-//					minimax(brd, currDepth+1);
-//					
-//					// Undo the move
-//					brd.numInCol[c]--;
-//					int row = brd.numInCol[c]; 
-//					brd.board[row][c] = ClobberState.emptySym;
-//					brd.numMoves--;
-//					brd.status = GameState.Status.GAME_ON;
-//					brd.who = currTurn;
-//					
-//					// Check out the results, relative to what we've seen before
-//					if (toMaximize && nextMove.score > bestMove.score) {
-//						bestMove.set(new ClobberMove(), nextMove.score);
-//					} else if (!toMaximize && nextMove.score < bestMove.score) {
-//						bestMove.set(new ClobberMove(), nextMove.score);
-//					}
-//				}
-//			}
 		}
 	}
 	
