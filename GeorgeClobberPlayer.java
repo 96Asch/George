@@ -70,6 +70,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 
 	private void minimax(ClobberState brd, int currDepth)
 	{
+		brd.toString();
 		boolean toMaximize = (brd.getWho() == GameState.Who.HOME);
 		boolean isTerminal = terminalValue(brd, mvStack[currDepth]);
 		
@@ -103,7 +104,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 			for(int i = 0; i < ClobberState.ROWS; i++){
 				for(int j = 0; j < ClobberState.COLS; j++){
 					if(brd.board[i][j] == mySymbol){
-						if(i > 0){
+						if(i > 0 && brd.board[i-1][j] == oppSymbol){
 							tempMv.row1 = i;
 							tempMv.col1 = j;
 							tempMv.row2 = i - 1;
@@ -126,7 +127,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 								bestMove.set(tempMv, nextMove.score);
 							}
 						}
-						if(i < ClobberState.ROWS -1){
+						if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol){
 							tempMv.row1 = i;
 							tempMv.col1 = j;
 							tempMv.row2 = i + 1;
@@ -149,7 +150,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 								bestMove.set(tempMv, nextMove.score);
 							}
 						}
-						if(j > 0){
+						if(j > 0 && brd.board[i][j-1] == oppSymbol){
 							tempMv.row1 = i;
 							tempMv.col1 = j;
 							tempMv.row2 = i;
@@ -172,7 +173,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 								bestMove.set(tempMv, nextMove.score);
 							}
 						}
-						if(j < ClobberState.COLS -1){
+						if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol){
 							tempMv.row1 = i;
 							tempMv.col1 = j;
 							tempMv.row2 = i;
@@ -219,17 +220,60 @@ public class GeorgeClobberPlayer extends GamePlayer {
 		for(int i = 0; i < ClobberState.ROWS; i++){
 			for(int j = 0; j < ClobberState.COLS; j++){
 				if(brd.board[i][j] == mySymbol){
-					if(i > 0 && brd.board[i-1][j] == mySymbol){
+					//George is home score
+					if(i > 0 && brd.board[i-1][j] == mySymbol && mySymbol == ClobberState.homeSym){
 						score++;
 					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol){
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol && mySymbol == ClobberState.homeSym){
 						score++;
 					}
-					if(j > 0 && brd.board[i][j-1] == mySymbol){
+					if(j > 0 && brd.board[i][j-1] == mySymbol && mySymbol == ClobberState.homeSym){
 						score++;
 					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol){
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol  && mySymbol == ClobberState.homeSym){
 						score++;
+					}
+					//George is away score
+					if(i > 0 && brd.board[i-1][j] == mySymbol && mySymbol == ClobberState.awaySym){
+						score--;
+					}
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol && mySymbol == ClobberState.awaySym){
+						score--;
+					}
+					if(j > 0 && brd.board[i][j-1] == mySymbol && mySymbol == ClobberState.awaySym){
+						score--;
+					}
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol  && mySymbol == ClobberState.awaySym){
+						score--;
+					}
+				}
+				
+				if(brd.board[i][j] == oppSymbol){
+					//Opponent is home score
+					if(i > 0 && brd.board[i-1][j] == oppSymbol && oppSymbol == ClobberState.homeSym){
+						score++;
+					}
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol && oppSymbol == ClobberState.homeSym){
+						score++;
+					}
+					if(j > 0 && brd.board[i][j-1] == oppSymbol && oppSymbol == ClobberState.homeSym){
+						score++;
+					}
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol  && oppSymbol == ClobberState.homeSym){
+						score++;
+					}
+					//Opponent is away score
+					if(i > 0 && brd.board[i-1][j] == oppSymbol && oppSymbol == ClobberState.awaySym){
+						score--;
+					}
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol && oppSymbol == ClobberState.awaySym){
+						score--;
+					}
+					if(j > 0 && brd.board[i][j-1] == oppSymbol && oppSymbol == ClobberState.awaySym){
+						score--;
+					}
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol  && oppSymbol == ClobberState.awaySym){
+						score--;
 					}
 				}
 			}
@@ -246,7 +290,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	
 	public static void main(String [] args)
 	{
-		int depth = 2;
+		int depth = 5;
 		GamePlayer p = new GeorgeClobberPlayer("George+", depth);
 		p.compete(args, 1);
 	}
