@@ -490,30 +490,30 @@ public class GeorgeClobberPlayer extends GamePlayer {
 		for(int i = 0; i < ClobberState.ROWS; i++){
 			for(int j = 0; j < ClobberState.COLS; j++){
 				if(brd.board[i][j] == oppSymbol){
-					//Opponent is home score
-					if(i > 0 && brd.board[i-1][j] == oppSymbol && oppSymbol == ClobberState.homeSym){
+					//add 1 for each move that cannot be made
+					if(i > 0 && (brd.board[i-1][j] == oppSymbol || brd.board[i-1][j] == ClobberState.emptySym)){
 						score++;
 					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol && oppSymbol == ClobberState.homeSym){
+					if(i < ClobberState.ROWS -1 && (brd.board[i+1][j] == oppSymbol || brd.board[i-1][j] == ClobberState.emptySym)){
 						score++;
 					}
-					if(j > 0 && brd.board[i][j-1] == oppSymbol && oppSymbol == ClobberState.homeSym){
+					if(j > 0 && (brd.board[i][j-1] == oppSymbol || brd.board[i-1][j] == ClobberState.emptySym)){
 						score++;
 					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol  && oppSymbol == ClobberState.homeSym){
+					if(j < ClobberState.COLS -1 && (brd.board[i][j+1] == oppSymbol || brd.board[i-1][j] == ClobberState.emptySym)){
 						score++;
 					}
-					//Opponent is away score
-					if(i > 0 && brd.board[i-1][j] == oppSymbol && oppSymbol == ClobberState.awaySym){
+					//subtract 1 for each move that can be made by the opponent
+					if(i > 0 && brd.board[i-1][j] == mySymbol){
 						score--;
 					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol && oppSymbol == ClobberState.awaySym){
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol){
 						score--;
 					}
-					if(j > 0 && brd.board[i][j-1] == oppSymbol && oppSymbol == ClobberState.awaySym){
+					if(j > 0 && brd.board[i][j-1] == mySymbol){
 						score--;
 					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol  && oppSymbol == ClobberState.awaySym){
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol){
 						score--;
 					}
 				}
@@ -544,32 +544,37 @@ public class GeorgeClobberPlayer extends GamePlayer {
 		}
 		for(int i = 0; i < ClobberState.ROWS; i++){
 			for(int j = 0; j < ClobberState.COLS; j++){
-				if(brd.board[i][j] == oppSymbol){
-					//Opponent is home score
-					if(i > 0 && brd.board[i-1][j] == oppSymbol && oppSymbol == ClobberState.homeSym){
-						score++;
+				if(brd.board[i][j] == mySymbol){
+					boolean touchingFriend=false;
+					boolean touchingOpponent=false;
+					//Note: we can modify this to add up the number of touching opponent and friendly pieces instead and do a score based on that
+					if(i > 0 && brd.board[i-1][j] == mySymbol){
+						touchingFriend=true;
 					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol && oppSymbol == ClobberState.homeSym){
-						score++;
+					if(i > 0 && brd.board[i-1][j] == oppSymbol){
+						touchingOpponent=true;
 					}
-					if(j > 0 && brd.board[i][j-1] == oppSymbol && oppSymbol == ClobberState.homeSym){
-						score++;
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol){
+						touchingFriend=true;
 					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol  && oppSymbol == ClobberState.homeSym){
-						score++;
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol){
+						touchingOpponent=true;
+					}
+					if(j > 0 && brd.board[i][j-1] == mySymbol){
+						touchingFriend=true;
+					}
+					if(j > 0 && brd.board[i][j-1] == oppSymbol){
+						touchingOpponent=true;
+					}
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol){
+						touchingFriend=true;
+					}
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol){
+						touchingOpponent=true;
 					}
 					//Opponent is away score
-					if(i > 0 && brd.board[i-1][j] == oppSymbol && oppSymbol == ClobberState.awaySym){
-						score--;
-					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol && oppSymbol == ClobberState.awaySym){
-						score--;
-					}
-					if(j > 0 && brd.board[i][j-1] == oppSymbol && oppSymbol == ClobberState.awaySym){
-						score--;
-					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol  && oppSymbol == ClobberState.awaySym){
-						score--;
+					if(touchingOpponent&&touchingFriend){
+						score+=5.0;//suggested that this be weighted more heavily than just 1
 					}
 				}
 			}
@@ -579,7 +584,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	
 	/**
 	 * Count up number of pieces George has that are adjacent to each other, one for each adjacency
-	 * TODO: not yet finished
+	 * TODO: Done, this is done in Eval board
 	 * @param brd
 	 * @return
 	 */
