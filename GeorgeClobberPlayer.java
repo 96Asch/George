@@ -892,8 +892,11 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	}
 	
 	/**
-	 * Count up number of pieces George has that are adjacent to each other, one for each adjacency
-	 * TODO: Done, this is done in Eval board
+	 * Heuristic "3" appears to have been done in evalboard
+	 * This and the remaining heuristics will be off by one
+	 * This is heuristic 4: center board control, add up number of your pieces in the center:
+	 * rows: 1,2,3,4 cols: 1,2,3
+	 * TODO: need to do 
 	 * @param brd
 	 * @return
 	 */
@@ -912,33 +915,88 @@ public class GeorgeClobberPlayer extends GamePlayer {
 			oppSymbol = ClobberState.awaySym;
 		}
 		for(int i = 0; i < ClobberState.ROWS; i++){
+			if(i<5&&i>0){
+				for(int j = 0; j < ClobberState.COLS; j++){
+					if(j<4 && j>0 && brd.board[i][j] == mySymbol){
+						score++;
+					}
+				}
+			}
+			
+		}
+		return score;
+	}
+	
+	/**
+	 * Heuristic "5": Edge Control use rows 0, 1, 4, 5 and cols: 0,1,3,4
+	 * @param brd
+	 * @return
+	 */
+	public double heuristic4(ClobberState brd){
+		double score = 0;
+		char mySymbol;
+		char oppSymbol;
+		GameState.Who currTurn = brd.getWho();
+		
+		if(currTurn == Who.AWAY){
+			mySymbol = ClobberState.awaySym;
+			oppSymbol = ClobberState.homeSym;
+		}
+		else {
+			mySymbol = ClobberState.homeSym;
+			oppSymbol = ClobberState.awaySym;
+		}
+		for(int i = 0; i < ClobberState.ROWS; i++){
+			if(i<2||i>3){
+				for(int j = 0; j < ClobberState.COLS; j++){
+					if(j!=2 && brd.board[i][j] == mySymbol){
+						score++;
+					}
+				}
+			}
+			
+		}
+		return score;
+	}
+	
+	/**
+	 * Heuristic "6" number of our pieces that can move
+	 * TODO: consider scoring issue in heuristic ideas.txt
+	 * @param brd
+	 * @return
+	 */
+	public double heuristic5(ClobberState brd){
+		double score = 0;
+		char mySymbol;
+		char oppSymbol;
+		GameState.Who currTurn = brd.getWho();
+		
+		if(currTurn == Who.AWAY){
+			mySymbol = ClobberState.awaySym;
+			oppSymbol = ClobberState.homeSym;
+		}
+		else {
+			mySymbol = ClobberState.homeSym;
+			oppSymbol = ClobberState.awaySym;
+		}
+		for(int i = 0; i < ClobberState.ROWS; i++){
 			for(int j = 0; j < ClobberState.COLS; j++){
-				if(brd.board[i][j] == oppSymbol){
-					//Opponent is home score
-					if(i > 0 && brd.board[i-1][j] == oppSymbol && oppSymbol == ClobberState.homeSym){
-						score++;
+				if(brd.board[i][j] == mySymbol){
+					boolean touchingOpponent=false;
+					if(i > 0 && brd.board[i-1][j] == oppSymbol){
+						touchingOpponent=true;
+					}					
+					if(!touchingOpponent && i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol){
+						touchingOpponent=true;
 					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol && oppSymbol == ClobberState.homeSym){
-						score++;
+					if(!touchingOpponent && j > 0 && brd.board[i][j-1] == oppSymbol){
+						touchingOpponent=true;
 					}
-					if(j > 0 && brd.board[i][j-1] == oppSymbol && oppSymbol == ClobberState.homeSym){
-						score++;
+					if(!touchingOpponent && j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol){
+						touchingOpponent=true;
 					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol  && oppSymbol == ClobberState.homeSym){
-						score++;
-					}
-					//Opponent is away score
-					if(i > 0 && brd.board[i-1][j] == oppSymbol && oppSymbol == ClobberState.awaySym){
-						score--;
-					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol && oppSymbol == ClobberState.awaySym){
-						score--;
-					}
-					if(j > 0 && brd.board[i][j-1] == oppSymbol && oppSymbol == ClobberState.awaySym){
-						score--;
-					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol  && oppSymbol == ClobberState.awaySym){
-						score--;
+					if(touchingOpponent){
+						score++;   //increment score only by one, verified that this piece can move
 					}
 				}
 			}
@@ -946,7 +1004,61 @@ public class GeorgeClobberPlayer extends GamePlayer {
 		return score;
 	}
 	
-	//TODO: add remaining heuristic ideas
+	/**
+	 * Heuristic "7" number of their pieces that can move
+	 * TODO: consider scoring issue in heuristic ideas.txt
+	 * @param brd
+	 * @return
+	 */
+	public double heuristic6(ClobberState brd){
+		double score = 0;
+		char mySymbol;
+		char oppSymbol;
+		GameState.Who currTurn = brd.getWho();
+		
+		if(currTurn == Who.AWAY){
+			mySymbol = ClobberState.awaySym;
+			oppSymbol = ClobberState.homeSym;
+		}
+		else {
+			mySymbol = ClobberState.homeSym;
+			oppSymbol = ClobberState.awaySym;
+		}
+		for(int i = 0; i < ClobberState.ROWS; i++){
+			for(int j = 0; j < ClobberState.COLS; j++){
+				if(brd.board[i][j] == oppSymbol){
+					boolean touchingOpponent=false;
+					if(i > 0 && brd.board[i-1][j] == mySymbol){
+						touchingOpponent=true;
+					}					
+					if(!touchingOpponent && i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol){
+						touchingOpponent=true;
+					}
+					if(!touchingOpponent && j > 0 && brd.board[i][j-1] == mySymbol){
+						touchingOpponent=true;
+					}
+					if(!touchingOpponent && j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol){
+						touchingOpponent=true;
+					}
+					//Opponent is away score
+					if(touchingOpponent){
+						score++;   //increment score only by one, verified that this piece can move
+					}
+				}
+			}
+		}
+		return score;
+	}
+	
+	/**
+	 * Num our pieces that can move - num their pieces that can move
+	 * TODO: Consider question posed in heuristicIdeas.txt
+	 * @param brd
+	 * @return
+	 */
+	public double heuristic7(ClobberState brd){
+		return heuristic5(brd)-heuristic6(brd);
+	}
 	
 	public GameMove getMove(GameState state, String lastMove)
 	{

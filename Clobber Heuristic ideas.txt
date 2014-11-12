@@ -6,11 +6,22 @@ is an opponent piece that can move on one of them add 1 to the heuristic to make
 Heuristic 3: Count up number of pieces adjacent
 
 Heuristic 4: Center control: count up number of pieces in the center of the board
+				(can change quickly to subtract by number of opponent pieces as well)
 
 Heuristic 5: Edge Control: count up number of pieces on the edge of the board
+				(can change quickly to subtract by number of opponent pieces as well)
 
 Heuristic 6: count up number of possible moves we have
 
-Heuristic 7: count up number of possible moves opponent has
+Heuristic 7: count up number of possible moves opponent has... this should be the same as the other one
+		I'm going to revise both 6 and 7 to be the number of pieces we/opponent has that can move
+			that number will be different in some cases
+Question regarding 6 & 7, do we want to have more or fewer of our pieces to be able to move
+and do we want more or fewer of our opponent pieces to move, this will impact the score
+For example, I would consider it a good thing if three of their pieces were touching one of our pieces
+and were on an "island" as taking that piece would remove all three of their pieces from play.
 
 Heuristic 8: count up number of possible moves we have-number of possible moves opponent has
+		following the revisions to heuristics 6 and 7 this will simply call those heuristics
+			and subtract the result of 7 from the result of 6 
+			(#OurPiecesWithMoves - #TheirPiecesWithMoves)
