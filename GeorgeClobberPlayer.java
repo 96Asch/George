@@ -926,6 +926,91 @@ public class GeorgeClobberPlayer extends GamePlayer {
 		return heuristic5(brd)-heuristic6(brd);
 	}
 	
+	/**
+	 * This is really heuristic 3
+	 * @param brd
+	 * @return
+	 */
+	public double heuristic8(ClobberState brd){
+		double score = 0;
+		char mySymbol;
+		char oppSymbol;
+		GameState.Who currTurn = brd.getWho();
+		
+		if(currTurn == Who.AWAY){
+			mySymbol = ClobberState.awaySym;
+			oppSymbol = ClobberState.homeSym;
+		}
+		else {
+			mySymbol = ClobberState.homeSym;
+			oppSymbol = ClobberState.awaySym;
+		}
+
+		for(int i = 0; i < ClobberState.ROWS; i++){
+			for(int j = 0; j < ClobberState.COLS; j++){
+				if(brd.board[i][j] == mySymbol){
+					//George is home score
+					if(i > 0 && brd.board[i-1][j] == mySymbol && mySymbol == ClobberState.homeSym){
+						score++;
+					}
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol && mySymbol == ClobberState.homeSym){
+						score++;
+					}
+					if(j > 0 && brd.board[i][j-1] == mySymbol && mySymbol == ClobberState.homeSym){
+						score++;
+					}
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol  && mySymbol == ClobberState.homeSym){
+						score++;
+					}
+					//George is away score
+					if(i > 0 && brd.board[i-1][j] == mySymbol && mySymbol == ClobberState.awaySym){
+						score--;
+					}
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol && mySymbol == ClobberState.awaySym){
+						score--;
+					}
+					if(j > 0 && brd.board[i][j-1] == mySymbol && mySymbol == ClobberState.awaySym){
+						score--;
+					}
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol  && mySymbol == ClobberState.awaySym){
+						score--;
+					}
+				}
+				
+				if(brd.board[i][j] == oppSymbol){
+					//Opponent is home score
+					if(i > 0 && brd.board[i-1][j] == oppSymbol && oppSymbol == ClobberState.homeSym){
+						score++;
+					}
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol && oppSymbol == ClobberState.homeSym){
+						score++;
+					}
+					if(j > 0 && brd.board[i][j-1] == oppSymbol && oppSymbol == ClobberState.homeSym){
+						score++;
+					}
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol  && oppSymbol == ClobberState.homeSym){
+						score++;
+					}
+					//Opponent is away score
+					if(i > 0 && brd.board[i-1][j] == oppSymbol && oppSymbol == ClobberState.awaySym){
+						score--;
+					}
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol && oppSymbol == ClobberState.awaySym){
+						score--;
+					}
+					if(j > 0 && brd.board[i][j-1] == oppSymbol && oppSymbol == ClobberState.awaySym){
+						score--;
+					}
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol  && oppSymbol == ClobberState.awaySym){
+						score--;
+					}
+				}
+			}
+		}
+		
+		return score;
+	}
+	
 	public GameMove getMove(GameState state, String lastMove)
 	{
 		possibleMoves = new ArrayList<ScoredClobberMove>();
