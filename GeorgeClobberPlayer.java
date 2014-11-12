@@ -604,13 +604,13 @@ public class GeorgeClobberPlayer extends GamePlayer {
 					if(i > 0 && (brd.board[i-1][j] == oppSymbol || brd.board[i-1][j] == ClobberState.emptySym)){
 						score++;
 					}
-					if(i < ClobberState.ROWS -1 && (brd.board[i+1][j] == oppSymbol || brd.board[i-1][j] == ClobberState.emptySym)){
+					if(i < ClobberState.ROWS -1 && (brd.board[i+1][j] == oppSymbol || brd.board[i+1][j] == ClobberState.emptySym)){
 						score++;
 					}
-					if(j > 0 && (brd.board[i][j-1] == oppSymbol || brd.board[i-1][j] == ClobberState.emptySym)){
+					if(j > 0 && (brd.board[i][j-1] == oppSymbol || brd.board[i][j-1] == ClobberState.emptySym)){
 						score++;
 					}
-					if(j < ClobberState.COLS -1 && (brd.board[i][j+1] == oppSymbol || brd.board[i-1][j] == ClobberState.emptySym)){
+					if(j < ClobberState.COLS -1 && (brd.board[i][j+1] == oppSymbol || brd.board[i][j+1] == ClobberState.emptySym)){
 						score++;
 					}
 					//subtract 1 for each move that can be made by the opponent
