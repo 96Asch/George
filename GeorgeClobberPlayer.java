@@ -931,17 +931,21 @@ public class GeorgeClobberPlayer extends GamePlayer {
 		return score;
 	}
 	
+	public void openBook(ClobberState state){
+		
+	}
+	
 	public double evalBoard(ClobberState brd){
 		double score = 0;
 		
-		score += heuristic1(brd);
-		score += heuristic2(brd);
+		//score += heuristic1(brd);
+		//score += heuristic2(brd);
 		score += heuristic3(brd);
 		//score += heuristic4(brd);
-		score += heuristic5(brd);
-		score += heuristic6(brd);
-		score += heuristic7(brd);
-		score += heuristic8(brd);
+		//score += heuristic5(brd);
+		//score += heuristic6(brd);
+		//score += heuristic7(brd);
+		//score += heuristic8(brd);
 		
 		return score;
 	}
@@ -950,6 +954,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	{
 		possibleMoves = new ArrayList<ScoredClobberMove>();
 		moves = new ArrayList<ScoredClobberMove>();
+		//openBook((ClobberState)state);
 		alphaBeta((ClobberState)state, 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 		//alphaBetaThreads((ClobberState)state, 0);
 		return mvStack[0];
@@ -957,7 +962,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	
 	public static void main(String [] args)
 	{
-		int depth = 8;
+		int depth = 12;
 		GamePlayer p = new GeorgeClobberPlayer("George+", depth);
 		p.compete(args, 1);
 	}
