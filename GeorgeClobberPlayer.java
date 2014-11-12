@@ -564,80 +564,15 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	
 	public double evalBoard(ClobberState brd){
 		double score = 0;
-		char mySymbol;
-		char oppSymbol;
-		GameState.Who currTurn = brd.getWho();
 		
-		if(currTurn == Who.AWAY){
-			mySymbol = ClobberState.awaySym;
-			oppSymbol = ClobberState.homeSym;
-		}
-		else {
-			mySymbol = ClobberState.homeSym;
-			oppSymbol = ClobberState.awaySym;
-		}
-
-		for(int i = 0; i < ClobberState.ROWS; i++){
-			for(int j = 0; j < ClobberState.COLS; j++){
-				if(brd.board[i][j] == mySymbol){
-					//George is home score
-					if(i > 0 && brd.board[i-1][j] == mySymbol && mySymbol == ClobberState.homeSym){
-						score++;
-					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol && mySymbol == ClobberState.homeSym){
-						score++;
-					}
-					if(j > 0 && brd.board[i][j-1] == mySymbol && mySymbol == ClobberState.homeSym){
-						score++;
-					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol  && mySymbol == ClobberState.homeSym){
-						score++;
-					}
-					//George is away score
-					if(i > 0 && brd.board[i-1][j] == mySymbol && mySymbol == ClobberState.awaySym){
-						score--;
-					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol && mySymbol == ClobberState.awaySym){
-						score--;
-					}
-					if(j > 0 && brd.board[i][j-1] == mySymbol && mySymbol == ClobberState.awaySym){
-						score--;
-					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol  && mySymbol == ClobberState.awaySym){
-						score--;
-					}
-				}
-				
-				if(brd.board[i][j] == oppSymbol){
-					//Opponent is home score
-					if(i > 0 && brd.board[i-1][j] == oppSymbol && oppSymbol == ClobberState.homeSym){
-						score++;
-					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol && oppSymbol == ClobberState.homeSym){
-						score++;
-					}
-					if(j > 0 && brd.board[i][j-1] == oppSymbol && oppSymbol == ClobberState.homeSym){
-						score++;
-					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol  && oppSymbol == ClobberState.homeSym){
-						score++;
-					}
-					//Opponent is away score
-					if(i > 0 && brd.board[i-1][j] == oppSymbol && oppSymbol == ClobberState.awaySym){
-						score--;
-					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol && oppSymbol == ClobberState.awaySym){
-						score--;
-					}
-					if(j > 0 && brd.board[i][j-1] == oppSymbol && oppSymbol == ClobberState.awaySym){
-						score--;
-					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol  && oppSymbol == ClobberState.awaySym){
-						score--;
-					}
-				}
-			}
-		}
+		score += heuristic1(brd);
+		score += heuristic2(brd);
+		score += heuristic3(brd);
+		//score += heuristic4(brd);
+		score += heuristic5(brd);
+		score += heuristic6(brd);
+		score += heuristic7(brd);
+		score += heuristic8(brd);
 		
 		return score;
 	}
@@ -1015,8 +950,8 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	{
 		possibleMoves = new ArrayList<ScoredClobberMove>();
 		moves = new ArrayList<ScoredClobberMove>();
-		//alphaBeta((ClobberState)state, 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-		alphaBetaThreads((ClobberState)state, 0);
+		alphaBeta((ClobberState)state, 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+		//alphaBetaThreads((ClobberState)state, 0);
 		return mvStack[0];
 	}
 	
