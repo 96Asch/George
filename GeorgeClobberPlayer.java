@@ -565,13 +565,13 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	public double evalBoard(ClobberState brd){
 		double score = 0;
 		
-		score += heuristic1(brd);
+		//score += heuristic1(brd);
 		score += heuristic2(brd);
-		score += heuristic3(brd);
+		//score += heuristic3(brd);
 		//score += heuristic4(brd);
-		score += heuristic5(brd);
-		score += heuristic6(brd);
-		score += heuristic7(brd);
+		//score += heuristic5(brd);
+		//score += heuristic6(brd);
+		//score += heuristic7(brd);
 		score += heuristic8(brd);
 		
 		return score;
@@ -888,26 +888,26 @@ public class GeorgeClobberPlayer extends GamePlayer {
 					if(i > 0 && brd.board[i-1][j] == mySymbol && mySymbol == ClobberState.homeSym){
 						score++;
 					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol && mySymbol == ClobberState.homeSym){
+					if(i < ClobberState.ROWS - 1 && brd.board[i+1][j] == mySymbol && mySymbol == ClobberState.homeSym){
 						score++;
 					}
 					if(j > 0 && brd.board[i][j-1] == mySymbol && mySymbol == ClobberState.homeSym){
 						score++;
 					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol  && mySymbol == ClobberState.homeSym){
+					if(j < ClobberState.COLS - 1 && brd.board[i][j+1] == mySymbol  && mySymbol == ClobberState.homeSym){
 						score++;
 					}
 					//George is away score
 					if(i > 0 && brd.board[i-1][j] == mySymbol && mySymbol == ClobberState.awaySym){
 						score--;
 					}
-					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == mySymbol && mySymbol == ClobberState.awaySym){
+					if(i < ClobberState.ROWS - 1 && brd.board[i+1][j] == mySymbol && mySymbol == ClobberState.awaySym){
 						score--;
 					}
 					if(j > 0 && brd.board[i][j-1] == mySymbol && mySymbol == ClobberState.awaySym){
 						score--;
 					}
-					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == mySymbol  && mySymbol == ClobberState.awaySym){
+					if(j < ClobberState.COLS - 1 && brd.board[i][j+1] == mySymbol  && mySymbol == ClobberState.awaySym){
 						score--;
 					}
 				}
@@ -957,7 +957,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	
 	public static void main(String [] args)
 	{
-		int depth = 5;
+		int depth = 8;
 		GamePlayer p = new GeorgeClobberPlayer("George+", depth);
 		p.compete(args, 1);
 	}
