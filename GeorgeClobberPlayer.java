@@ -562,21 +562,6 @@ public class GeorgeClobberPlayer extends GamePlayer {
 		}
 	}
 	
-	public double evalBoard(ClobberState brd){
-		double score = 0;
-		
-		//score += heuristic1(brd);
-		score += heuristic2(brd);
-		//score += heuristic3(brd);
-		//score += heuristic4(brd);
-		//score += heuristic5(brd);
-		//score += heuristic6(brd);
-		//score += heuristic7(brd);
-		score += heuristic8(brd);
-		
-		return score;
-	}
-	
 	/**
 	 * Isolate the opponent's pieces 
 	 * TODO: Not yet finished
@@ -942,6 +927,21 @@ public class GeorgeClobberPlayer extends GamePlayer {
 				}
 			}
 		}
+		
+		return score;
+	}
+	
+	public double evalBoard(ClobberState brd){
+		double score = 0;
+		
+		score += heuristic1(brd);
+		score += heuristic2(brd);
+		score += heuristic3(brd);
+		//score += heuristic4(brd);
+		score += heuristic5(brd);
+		score += heuristic6(brd);
+		score += heuristic7(brd);
+		score += heuristic8(brd);
 		
 		return score;
 	}
