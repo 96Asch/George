@@ -1,11 +1,15 @@
 package clobber;
 import game.*;
 import game.GameState.Who;
+import java.util.*;
 
 public class GeorgeClobberPlayer extends GamePlayer {
 	public final int MAX_DEPTH = 50;
 	public int depthLimit;
 	public final int MAX_SCORE = 100000;
+	
+	public ArrayList<ScoredClobberMove> possibleMoves;
+	public ArrayList<ScoredClobberMove> moves;
 	
 	protected ScoredClobberMove [] mvStack;
 	
@@ -24,6 +28,232 @@ public class GeorgeClobberPlayer extends GamePlayer {
 			score = s;
 		}
 		public double score;
+	}
+	
+	protected class AlphaBetaThread implements Runnable{
+		protected ScoredClobberMove[] mStack;
+		protected ClobberState brd;
+		
+		public AlphaBetaThread(ClobberState state){
+			brd = state;
+		}
+		
+		public void run(){
+			mStack = new ScoredClobberMove [MAX_DEPTH];
+			for (int i=0; i<MAX_DEPTH; i++) {
+				mStack[i] = new ScoredClobberMove(new ClobberMove(),0);
+			}
+			boolean done = false;
+			while(!done){
+				ScoredClobberMove move = getMove();
+				if(move == null){
+					done = true;
+					return;
+				}
+				ClobberState board = (ClobberState)brd.clone();
+				board.makeMove(move);
+				alphaBeta(board, 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+				setPossibleScore(mStack[0]);
+			}
+		}
+		
+		private void alphaBeta(ClobberState brd, int currDepth, double alpha, double beta)
+		{
+			boolean toMaximize = (brd.getWho() == GameState.Who.HOME);
+			boolean toMinimize = !toMaximize;
+			boolean isTerminal = terminalValue(brd, mStack[currDepth]);
+			
+			if (isTerminal) {
+				;
+			} else if (currDepth == depthLimit) {
+				mStack[currDepth].set(new ClobberMove(), evalBoard(brd));
+			} else {
+				ScoredClobberMove tempMv = new ScoredClobberMove(new ClobberMove(), 0);
+
+				double bestScore = (toMaximize ? Double.NEGATIVE_INFINITY :
+													Double.POSITIVE_INFINITY);
+				ScoredClobberMove bestMove = mStack[currDepth];
+				ScoredClobberMove nextMove = mStack[currDepth+1];
+				
+				bestMove.set(new ClobberMove(), bestScore);
+				GameState.Who currTurn = brd.getWho();
+				char mySymbol;
+				char oppSymbol;
+				
+				if(currTurn == Who.AWAY){
+					mySymbol = ClobberState.awaySym;
+					oppSymbol = ClobberState.homeSym;
+				}
+				else {
+					mySymbol = ClobberState.homeSym;
+					oppSymbol = ClobberState.awaySym;
+				}
+				
+				for(int i = 0; i < ClobberState.ROWS; i++){
+					for(int j = 0; j < ClobberState.COLS; j++){
+						if(brd.board[i][j] == mySymbol){
+							if(i > 0 && brd.board[i-1][j] == oppSymbol){
+								tempMv.row1 = i;
+								tempMv.col1 = j;
+								tempMv.row2 = i - 1;
+								tempMv.col2 = j;
+								brd.makeMove(tempMv);
+
+								alphaBeta(brd, currDepth+1, alpha, beta);
+								
+								//Undo move
+								brd.board[i][j] = mySymbol;
+								brd.board[i-1][j] = oppSymbol;
+								brd.numMoves--;
+								brd.status = GameState.Status.GAME_ON;
+								brd.who = currTurn;
+
+								//Check Results
+								if (toMaximize && nextMove.score > bestMove.score) {
+									bestMove.set(tempMv, nextMove.score);
+								} else if (!toMaximize && nextMove.score < bestMove.score) {
+									bestMove.set(tempMv, nextMove.score);
+								}
+								
+								// Update alpha and beta. Perform pruning, if possible.
+								if (toMinimize) {
+									beta = Math.min(bestMove.score, beta);
+									if (bestMove.score <= alpha || bestMove.score == -MAX_SCORE) {
+										return;
+									}
+								} else {
+									alpha = Math.max(bestMove.score, alpha);
+									if (bestMove.score >= beta || bestMove.score == MAX_SCORE) {
+										return;
+									}
+								}
+							}
+							if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol){
+								tempMv.row1 = i;
+								tempMv.col1 = j;
+								tempMv.row2 = i + 1;
+								tempMv.col2 = j;
+								brd.makeMove(tempMv);
+
+								alphaBeta(brd, currDepth+1, alpha, beta);
+
+								//Undo move
+								brd.board[i][j] = mySymbol;
+								brd.board[i+1][j] = oppSymbol;
+								brd.numMoves--;
+								brd.status = GameState.Status.GAME_ON;
+								brd.who = currTurn;
+
+								//Check Results
+								if (toMaximize && nextMove.score > bestMove.score) {
+									bestMove.set(tempMv, nextMove.score);
+								} else if (!toMaximize && nextMove.score < bestMove.score) {
+									bestMove.set(tempMv, nextMove.score);
+								}
+								
+								// Update alpha and beta. Perform pruning, if possible.
+								if (toMinimize) {
+									beta = Math.min(bestMove.score, beta);
+									if (bestMove.score <= alpha || bestMove.score == -MAX_SCORE) {
+										return;
+									}
+								} else {
+									alpha = Math.max(bestMove.score, alpha);
+									if (bestMove.score >= beta || bestMove.score == MAX_SCORE) {
+										return;
+									}
+								}
+							}
+							if(j > 0 && brd.board[i][j-1] == oppSymbol){
+								tempMv.row1 = i;
+								tempMv.col1 = j;
+								tempMv.row2 = i;
+								tempMv.col2 = j - 1;
+								brd.makeMove(tempMv);
+
+								alphaBeta(brd, currDepth+1, alpha, beta);
+								
+								//Undo move
+								brd.board[i][j] = mySymbol;
+								brd.board[i][j-1] = oppSymbol;
+								brd.numMoves--;
+								brd.status = GameState.Status.GAME_ON;
+								brd.who = currTurn;
+
+								//Check Results
+								if (toMaximize && nextMove.score > bestMove.score) {
+									bestMove.set(tempMv, nextMove.score);
+								} else if (!toMaximize && nextMove.score < bestMove.score) {
+									bestMove.set(tempMv, nextMove.score);
+								}
+								
+								// Update alpha and beta. Perform pruning, if possible.
+								if (toMinimize) {
+									beta = Math.min(bestMove.score, beta);
+									if (bestMove.score <= alpha || bestMove.score == -MAX_SCORE) {
+										return;
+									}
+								} else {
+									alpha = Math.max(bestMove.score, alpha);
+									if (bestMove.score >= beta || bestMove.score == MAX_SCORE) {
+										return;
+									}
+								}
+							}
+							if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol){
+								tempMv.row1 = i;
+								tempMv.col1 = j;
+								tempMv.row2 = i;
+								tempMv.col2 = j + 1;
+								brd.makeMove(tempMv);
+
+								alphaBeta(brd, currDepth+1, alpha, beta);
+								
+								//Undo move
+								brd.board[i][j] = mySymbol;
+								brd.board[i][j+1] = oppSymbol;
+								brd.numMoves--;
+								brd.status = GameState.Status.GAME_ON;
+								brd.who = currTurn;
+
+								//Check Results
+								if (toMaximize && nextMove.score > bestMove.score) {
+									bestMove.set(tempMv, nextMove.score);
+								} else if (!toMaximize && nextMove.score < bestMove.score) {
+									bestMove.set(tempMv, nextMove.score);
+								}
+								
+								// Update alpha and beta. Perform pruning, if possible.
+								if (toMinimize) {
+									beta = Math.min(bestMove.score, beta);
+									if (bestMove.score <= alpha || bestMove.score == -MAX_SCORE) {
+										return;
+									}
+								} else {
+									alpha = Math.max(bestMove.score, alpha);
+									if (bestMove.score >= beta || bestMove.score == MAX_SCORE) {
+										return;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public synchronized void setPossibleScore(ScoredClobberMove move){
+		possibleMoves.add(move);
+	}
+	
+	public synchronized ScoredClobberMove getMove(){
+		if(moves.size() != 0){
+			ScoredClobberMove move = moves.get(0);
+			moves.remove(0);
+			return move;
+		}
+		return null;
 	}
 	
 	public GeorgeClobberPlayer(String n, int d) 
@@ -386,6 +616,85 @@ public class GeorgeClobberPlayer extends GamePlayer {
 			}
 		}
 	}
+
+	private void alphaBetaThreads(ClobberState brd, int currDepth){
+		GameState.Who currTurn = brd.getWho();
+		char mySymbol;
+		char oppSymbol;
+		if(currTurn == Who.AWAY){
+			mySymbol = ClobberState.awaySym;
+			oppSymbol = ClobberState.homeSym;
+		}
+		else {
+			mySymbol = ClobberState.homeSym;
+			oppSymbol = ClobberState.awaySym;
+		}
+		ScoredClobberMove tempMv;
+		for(int i = 0; i < ClobberState.ROWS; i++){
+			for(int j = 0; j < ClobberState.COLS; j++){
+				if(brd.board[i][j] == mySymbol){
+					if(i > 0 && brd.board[i-1][j] == oppSymbol){
+						tempMv = new ScoredClobberMove(new ClobberMove(), 0);
+						tempMv.row1 = i;
+						tempMv.col1 = j;
+						tempMv.row2 = i - 1;
+						tempMv.col2 = j;
+						moves.add((ScoredClobberMove)tempMv.clone());
+					}
+					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol){
+						tempMv = new ScoredClobberMove(new ClobberMove(), 0);
+						tempMv.row1 = i;
+						tempMv.col1 = j;
+						tempMv.row2 = i + 1;
+						tempMv.col2 = j;
+						moves.add((ScoredClobberMove)tempMv.clone());
+					}
+					if(j > 0 && brd.board[i][j-1] == oppSymbol){
+						tempMv = new ScoredClobberMove(new ClobberMove(), 0);
+						tempMv.row1 = i;
+						tempMv.col1 = j;
+						tempMv.row2 = i;
+						tempMv.col2 = j - 1;	
+						moves.add((ScoredClobberMove)tempMv.clone());
+					}
+					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol){
+						tempMv = new ScoredClobberMove(new ClobberMove(), 0);
+						tempMv.row1 = i;
+						tempMv.col1 = j;
+						tempMv.row2 = i;
+						tempMv.col2 = j + 1;
+						moves.add((ScoredClobberMove)tempMv.clone());
+					}
+				}
+			}
+		}
+		Thread[] threads = new Thread[5];
+		for(int i = 0; i < 5; i++){
+			threads[i] = new Thread(new AlphaBetaThread(brd));
+			threads[i].run();
+		}
+		for(int i = 0; i < 5; i++){
+			try{
+				threads[i].join();
+			} catch (Exception e){
+				System.out.println("Error!/n" + e.getMessage());
+			}
+		}
+		double bestScore = Double.NEGATIVE_INFINITY;
+		ScoredClobberMove nextMove = null;
+		for(int i = 0; i < possibleMoves.size(); i++){
+			double score = possibleMoves.get(i).score;
+			if(score > bestScore){
+				bestScore = score;
+				nextMove = possibleMoves.get(i);
+			}
+		}
+		if(nextMove != null){
+			mvStack[0] = nextMove;
+		} else {
+			System.err.println("Error, null move after alphabeta move check!");
+		}
+	}
 	
 	public double evalBoard(ClobberState brd){
 		double score = 0;
@@ -641,7 +950,10 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	
 	public GameMove getMove(GameState state, String lastMove)
 	{
-		alphaBeta((ClobberState)state, 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+		possibleMoves = new ArrayList<ScoredClobberMove>();
+		moves = new ArrayList<ScoredClobberMove>();
+		//alphaBeta((ClobberState)state, 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+		alphaBetaThreads((ClobberState)state, 0);
 		return mvStack[0];
 	}
 	
