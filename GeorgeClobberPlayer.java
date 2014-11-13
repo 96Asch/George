@@ -8,7 +8,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	public int depthLimit;
 	public final int MAX_SCORE = 100000;
 	
-	public ArrayList<ScoredClobberMove> possibleMoves;
+	public ArrayDeque<ScoredClobberMove> possibleMoves;
 	public ArrayList<ScoredClobberMove> scoredMoves;
 	
 	protected ScoredClobberMove [] mvStack;
@@ -248,12 +248,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	}
 	
 	public synchronized ScoredClobberMove getMove(){
-		if(scoredMoves.size() != 0){
-			ScoredClobberMove move = scoredMoves.get(0);
-			scoredMoves.remove(0);
-			return move;
-		}
-		return null;
+		return possibleMoves.poll();
 	}
 	
 	public GeorgeClobberPlayer(String n, int d) 
@@ -548,11 +543,11 @@ public class GeorgeClobberPlayer extends GamePlayer {
 		}
 		double bestScore = Double.NEGATIVE_INFINITY;
 		ScoredClobberMove nextMove = null;
-		for(int i = 0; i < possibleMoves.size(); i++){
-			double score = possibleMoves.get(i).score;
+		for(int i = 0; i < scoredMoves.size(); i++){
+			double score = scoredMoves.get(i).score;
 			if(score > bestScore){
 				bestScore = score;
-				nextMove = possibleMoves.get(i);
+				nextMove = scoredMoves.get(i);
 			}
 		}
 		if(nextMove != null){
@@ -952,7 +947,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	
 	public GameMove getMove(GameState state, String lastMove)
 	{
-		possibleMoves = new ArrayList<ScoredClobberMove>();
+		possibleMoves = new ArrayDeque<ScoredClobberMove>();
 		scoredMoves = new ArrayList<ScoredClobberMove>();
 		//openBook((ClobberState)state);
 		alphaBeta((ClobberState)state, 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
