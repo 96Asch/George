@@ -9,7 +9,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	public final int MAX_SCORE = 100000;
 	
 	public ArrayList<ScoredClobberMove> possibleMoves;
-	public ArrayList<ScoredClobberMove> moves;
+	public ArrayList<ScoredClobberMove> scoredMoves;
 	
 	protected ScoredClobberMove [] mvStack;
 	
@@ -53,7 +53,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 				ClobberState board = (ClobberState)brd.clone();
 				board.makeMove(move);
 				alphaBeta(board, 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-				setPossibleScore(mStack[0]);
+				setPossibleMoves(mStack[0]);
 			}
 		}
 		
@@ -243,14 +243,14 @@ public class GeorgeClobberPlayer extends GamePlayer {
 		}
 	}
 	
-	public synchronized void setPossibleScore(ScoredClobberMove move){
+	public synchronized void setPossibleMoves(ScoredClobberMove move){
 		possibleMoves.add(move);
 	}
 	
 	public synchronized ScoredClobberMove getMove(){
-		if(moves.size() != 0){
-			ScoredClobberMove move = moves.get(0);
-			moves.remove(0);
+		if(scoredMoves.size() != 0){
+			ScoredClobberMove move = scoredMoves.get(0);
+			scoredMoves.remove(0);
 			return move;
 		}
 		return null;
@@ -505,7 +505,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 						tempMv.col1 = j;
 						tempMv.row2 = i - 1;
 						tempMv.col2 = j;
-						moves.add((ScoredClobberMove)tempMv.clone());
+						possibleMoves.add((ScoredClobberMove)tempMv.clone());
 					}
 					if(i < ClobberState.ROWS -1 && brd.board[i+1][j] == oppSymbol){
 						tempMv = new ScoredClobberMove(new ClobberMove(), 0);
@@ -513,7 +513,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 						tempMv.col1 = j;
 						tempMv.row2 = i + 1;
 						tempMv.col2 = j;
-						moves.add((ScoredClobberMove)tempMv.clone());
+						possibleMoves.add((ScoredClobberMove)tempMv.clone());
 					}
 					if(j > 0 && brd.board[i][j-1] == oppSymbol){
 						tempMv = new ScoredClobberMove(new ClobberMove(), 0);
@@ -521,7 +521,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 						tempMv.col1 = j;
 						tempMv.row2 = i;
 						tempMv.col2 = j - 1;	
-						moves.add((ScoredClobberMove)tempMv.clone());
+						possibleMoves.add((ScoredClobberMove)tempMv.clone());
 					}
 					if(j < ClobberState.COLS -1 && brd.board[i][j+1] == oppSymbol){
 						tempMv = new ScoredClobberMove(new ClobberMove(), 0);
@@ -529,7 +529,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 						tempMv.col1 = j;
 						tempMv.row2 = i;
 						tempMv.col2 = j + 1;
-						moves.add((ScoredClobberMove)tempMv.clone());
+						possibleMoves.add((ScoredClobberMove)tempMv.clone());
 					}
 				}
 			}
@@ -953,7 +953,7 @@ public class GeorgeClobberPlayer extends GamePlayer {
 	public GameMove getMove(GameState state, String lastMove)
 	{
 		possibleMoves = new ArrayList<ScoredClobberMove>();
-		moves = new ArrayList<ScoredClobberMove>();
+		scoredMoves = new ArrayList<ScoredClobberMove>();
 		//openBook((ClobberState)state);
 		alphaBeta((ClobberState)state, 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 		//alphaBetaThreads((ClobberState)state, 0);
